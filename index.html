@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vansh Mokani — AI/ML Engineer</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- ══ 3D WEBGL CANVAS (background) ══ -->
+  <canvas id="bg3d"></canvas>
+
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+
+      <!-- Logo + status dot -->
+      <a href="#home" class="nav-logo">
+        <span class="logo-bracket">&lt;</span>VM<span class="logo-bracket">/&gt;</span>
+        <span class="nav-status-dot" title="Available for work"></span>
+      </a>
+
+      <!-- Centre pill links -->
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about"        class="nav-link">About</a></li>
+        <li><a href="#skills"       class="nav-link">Skills</a></li>
+        <li><a href="#projects"     class="nav-link">Projects</a></li>
+        <li><a href="#certificates" class="nav-link">Certs</a></li>
+        <li><a href="#contact"      class="nav-link">Contact</a></li>
+      </ul>
+
+      <!-- Right actions -->
+      <div class="nav-actions">
+        <!-- Hire me CTA (hidden on small screens) -->
+        <a href="#contact" class="nav-cta">
+          <span class="nav-cta-dot"></span>Hire Me
+        </a>
+        <!-- Theme toggle -->
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <i data-lucide="sun"  class="icon-sun"></i>
+          <i data-lucide="moon" class="icon-moon"></i>
+        </button>
+        <!-- Hamburger (mobile) -->
+        <button class="hamburger" id="hamburger" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Mobile glassmorphism overlay -->
+  <div class="mobile-overlay" id="mobileOverlay">
+    <button class="overlay-close" id="overlayClose"><i data-lucide="x"></i></button>
+
+    <!-- Mobile logo -->
+    <div class="mobile-logo">
+      <span class="logo-bracket">&lt;</span>VM<span class="logo-bracket">/&gt;</span>
+    </div>
+
+    <ul class="mobile-nav-links">
+      <li><a href="#about"        class="mobile-link"><span>01</span>About</a></li>
+      <li><a href="#skills"       class="mobile-link"><span>02</span>Skills</a></li>
+      <li><a href="#projects"     class="mobile-link"><span>03</span>Projects</a></li>
+      <li><a href="#certificates" class="mobile-link"><span>04</span>Certs</a></li>
+      <li><a href="#contact"      class="mobile-link"><span>05</span>Contact</a></li>
+    </ul>
+
+    <a href="#contact" class="btn btn-primary mobile-cta">
+      <i data-lucide="mail"></i> Get In Touch
+    </a>
+
+    <!-- Social links in mobile menu -->
+    <div class="mobile-socials">
+      <a href="https://github.com/vanshmokani"      target="_blank" aria-label="GitHub">  <i data-lucide="github"></i>  </a>
+      <a href="www.linkedin.com/in/vansh-mokani-273333382" target="_blank" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
+      <a href="mailto:vanshmokani152@gmail.com"                      aria-label="Email">   <i data-lucide="mail"></i>    </a>
+    </div>
+  </div>
+
+  <!-- ═══════════ HERO ═══════════ -->
+  <section id="home" class="hero">
+    <div class="hero-bg">
+      <div class="gradient-orb orb-1"></div>
+      <div class="gradient-orb orb-2"></div>
+      <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge reveal">
+        <span class="badge-dot"></span>
+        Available for opportunities
+      </div>
+      <h1 class="hero-title reveal">
+        <span class="title-greeting">Hi, I'm</span>
+        <span class="title-name">Vansh Mokani</span>
+      </h1>
+      <h2 class="hero-role reveal">
+        <span class="role-text">AI/ML Engineering Student</span>
+        <span class="role-cursor">|</span>
+      </h2>
+      <p class="hero-tagline reveal">
+        Building intelligent systems with <span class="highlight">Python</span> and <span class="highlight">AI</span>.<br/>
+        Turning data into decisions, and ideas into products.
+      </p>
+      <div class="hero-actions reveal">
+        <a href="#projects" class="btn btn-primary">
+          <i data-lucide="layout-grid"></i> View Projects
+        </a>
+        <a href="#" class="btn btn-secondary" id="resumeBtn">
+          <i data-lucide="download"></i> Download Resume
+        </a>
+      </div>
+      <div class="hero-socials reveal">
+        <a href="https://github.com/vanshmokani"      target="_blank" class="social-link" aria-label="GitHub">  <i data-lucide="github"></i>  </a>
+        <a href="https://www.linkedin.com/in/vansh-mokani-273333382/" target="_blank" class="social-link" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
+        <a href="mailto:vanshmokani152@gmail.com"                      class="social-link" aria-label="Email">   <i data-lucide="mail"></i>    </a>
+      </div>
+    </div>
+
+    <!-- ── 3D profile sphere ── -->
+    <div class="hero-visual reveal">
+      <div class="profile3d-wrap" id="profile3dWrap">
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+        <div class="ring ring-3"></div>
+
+        <div class="profile-photo-frame">
+          <img src="photo.jpg" alt="Vansh Mokani" class="profile-real-img" />
+        </div>
+
+        <div class="tech-chip chip-1">🐍 Python</div>
+        <div class="tech-chip chip-2">🤖 ML</div>
+        <div class="tech-chip chip-3">🧠 AI</div>
+        <div class="tech-chip chip-4">⚡ DL</div>
+      </div>
+    </div>
+
+    <div class="scroll-indicator">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ═══════════ ABOUT ═══════════ -->
+  <section id="about" class="about section">
+    <div class="container">
+      <div class="section-label reveal"><span>01</span> About Me</div>
+      <div class="about-grid">
+
+        <div class="about-text reveal">
+          <h2 class="section-title">Passionate about building<br/><em>intelligent systems</em></h2>
+          <p>I'm Vansh Mokani, an AI/ML Engineering student on a mission to bridge the gap between cutting-edge research and real-world applications. My journey started with curiosity about how machines can think — and it's evolved into a deep passion for building AI-powered tools that solve actual problems.</p>
+          <p>I'm currently diving deep into Python, machine learning algorithms, and deep learning architectures. From voice assistants to face recognition systems, I love experimenting with technologies that feel like magic but are grounded in math and logic.</p>
+          <p>When I'm not training models, you'll find me exploring new AI tools, contributing to open-source projects, or reading the latest papers on arXiv.</p>
+          <div class="about-stats">
+            <div class="stat">
+              <div class="stat-row"><span class="stat-num counter" data-target="5">0</span><span class="stat-num">+</span></div>
+              <span class="stat-label">AI Projects</span>
+            </div>
+            <div class="stat">
+              <div class="stat-row"><span class="stat-num counter" data-target="4">0</span></div>
+              <span class="stat-label">Certificates</span>
+            </div>
+            <div class="stat">
+              <div class="stat-row"><span class="stat-num counter" data-target="3">0</span><span class="stat-num">+</span></div>
+              <span class="stat-label">Languages</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-card-wrap reveal">
+          <div class="about-card glass card-3d" id="aboutCard">
+            <div class="card-glare"></div>
+            <div class="profile-img-wrap">
+              <div class="profile-img">
+                <img src="photo.jpg" alt="Vansh Mokani" class="profile-real-img" />
+              </div>
+              <div class="profile-ring"></div>
+            </div>
+            <h3>Vansh Mokani</h3>
+            <p class="profile-role">AI/ML Engineering Student</p>
+            <div class="profile-tags">
+              <span class="tag">Python</span>
+              <span class="tag">Machine Learning</span>
+              <span class="tag">Deep Learning</span>
+              <span class="tag">AI Engineering</span>
+            </div>
+            <div class="profile-location">
+              <i data-lucide="map-pin"></i> India
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SKILLS ═══════════ -->
+  <section id="skills" class="skills section">
+    <div class="container">
+      <div class="section-label reveal"><span>02</span> Skills</div>
+      <h2 class="section-title centered reveal">Technical Arsenal</h2>
+      <p class="section-sub reveal">Languages, frameworks, and tools I work with</p>
+      <div class="skills-grid">
+
+        <div class="skill-category reveal card-3d">
+          <div class="card-glare"></div>
+          <div class="category-header"><i data-lucide="code-2"></i><h3>Programming</h3></div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-icon">🐍</span><span class="skill-name">Python</span><span class="skill-pct">92%</span></div>
+              <div class="skill-bar"><div class="skill-fill" data-width="92"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-icon">⚙️</span><span class="skill-name">C</span><span class="skill-pct">75%</span></div>
+              <div class="skill-bar"><div class="skill-fill" data-width="75"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-icon">🟨</span><span class="skill-name">JavaScript</span><span class="skill-pct">68%</span></div>
+              <div class="skill-bar"><div class="skill-fill" data-width="68"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="skill-category reveal card-3d">
+          <div class="card-glare"></div>
+          <div class="category-header"><i data-lucide="cpu"></i><h3>AI / ML</h3></div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-icon">🤖</span><span class="skill-name">Machine Learning</span><span class="skill-pct">85%</span></div>
+              <div class="skill-bar"><div class="skill-fill" data-width="85"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-icon">🧠</span><span class="skill-name">Deep Learning</span><span class="skill-pct">72%</span></div>
+              <div class="skill-bar"><div class="skill-fill" data-width="72"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-icon">✨</span><span class="skill-name">AI Fundamentals</span><span class="skill-pct">88%</span></div>
+              <div class="skill-bar"><div class="skill-fill" data-width="88"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="skill-category reveal card-3d">
+          <div class="card-glare"></div>
+          <div class="category-header"><i data-lucide="wrench"></i><h3>Tools</h3></div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-icon">🐙</span><span class="skill-name">Git & GitHub</span><span class="skill-pct">80%</span></div>
+              <div class="skill-bar"><div class="skill-fill" data-width="80"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-icon">💻</span><span class="skill-name">VS Code</span><span class="skill-pct">90%</span></div>
+              <div class="skill-bar"><div class="skill-fill" data-width="90"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-icon">⚡</span><span class="skill-name">Cursor AI & Claude</span><span class="skill-pct">82%</span></div>
+              <div class="skill-bar"><div class="skill-fill" data-width="82"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ PROJECTS ═══════════ -->
+  <section id="projects" class="projects section">
+    <div class="container">
+      <div class="section-label reveal"><span>03</span> Projects</div>
+      <h2 class="section-title centered reveal">What I've Built</h2>
+      <p class="section-sub reveal">Real-world AI applications and tools</p>
+      <div class="projects-grid">
+
+        <div class="project-card glass reveal card-3d" data-project="1">
+          <div class="card-glare"></div>
+          <div class="project-top">
+            <div class="project-icon">🤖</div>
+            <div class="project-links">
+              <a href="https://github.com/vanshmokani" target="_blank" class="icon-btn" title="GitHub"><i data-lucide="github"></i></a>
+              <a href="#" class="icon-btn" title="Live Demo"><i data-lucide="external-link"></i></a>
+            </div>
+          </div>
+          <h3 class="project-title">Jarvis AI Voice Assistant</h3>
+          <p class="project-desc">Python voice assistant with speech recognition, music control, and task automation. Speaks back to you, opens apps, and runs commands — just like the real Jarvis.</p>
+          <div class="project-tags"><span class="p-tag">Python</span><span class="p-tag">Speech Recognition</span><span class="p-tag">Automation</span></div>
+        </div>
+
+        <div class="project-card glass reveal card-3d" data-project="2">
+          <div class="card-glare"></div>
+          <div class="project-top">
+            <div class="project-icon">📰</div>
+            <div class="project-links">
+              <a href="https://github.com/vanshmokani" target="_blank" class="icon-btn" title="GitHub"><i data-lucide="github"></i></a>
+              <a href="#" class="icon-btn" title="Live Demo"><i data-lucide="external-link"></i></a>
+            </div>
+          </div>
+          <h3 class="project-title">AI News Reader</h3>
+          <p class="project-desc">Python app that fetches live news from APIs and reads them aloud using text-to-speech. Supports category filtering and voice-activated playback.</p>
+          <div class="project-tags"><span class="p-tag">Python</span><span class="p-tag">APIs</span><span class="p-tag">TTS</span></div>
+        </div>
+
+        <div class="project-card glass reveal card-3d" data-project="3">
+          <div class="card-glare"></div>
+          <div class="project-top">
+            <div class="project-icon">🎵</div>
+            <div class="project-links">
+              <a href="https://github.com/vanshmokani" target="_blank" class="icon-btn" title="GitHub"><i data-lucide="github"></i></a>
+              <a href="#" class="icon-btn" title="Live Demo"><i data-lucide="external-link"></i></a>
+            </div>
+          </div>
+          <h3 class="project-title">Spotify Style Music Player</h3>
+          <p class="project-desc">Python GUI music player with a sleek Spotify-inspired interface. Features shuffle mode, playlist support, volume control, and custom themes.</p>
+          <div class="project-tags"><span class="p-tag">Python</span><span class="p-tag">Tkinter</span><span class="p-tag">GUI</span></div>
+        </div>
+
+        <div class="project-card glass reveal card-3d featured" data-project="4">
+          <div class="card-glare"></div>
+          <div class="project-top">
+            <div class="project-icon">👤</div>
+            <div class="project-links">
+              <a href="https://github.com/vanshmokani" target="_blank" class="icon-btn" title="GitHub"><i data-lucide="github"></i></a>
+              <a href="#" class="icon-btn" title="Live Demo"><i data-lucide="external-link"></i></a>
+            </div>
+          </div>
+          <div class="featured-badge">⭐ Featured</div>
+          <h3 class="project-title">Face + QR Attendance System</h3>
+          <p class="project-desc">Smart attendance system combining facial recognition and QR code scanning. Auto-marks attendance, prevents proxies, and generates Excel reports.</p>
+          <div class="project-tags"><span class="p-tag">Python</span><span class="p-tag">OpenCV</span><span class="p-tag">Face Recognition</span><span class="p-tag">QR Code</span></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ CERTIFICATES ═══════════ -->
+  <section id="certificates" class="certificates section">
+    <div class="container">
+      <div class="section-label reveal"><span>04</span> Certificates</div>
+      <h2 class="section-title centered reveal">Credentials</h2>
+      <p class="section-sub reveal">Learning never stops — verified courses and certifications</p>
+      <div class="certs-grid">
+
+        <div class="cert-card glass reveal card-3d">
+          <div class="card-glare"></div>
+          <div class="cert-icon">🎓</div>
+          <div class="cert-body">
+            <span class="cert-issuer">Coursera · DeepLearning.AI</span>
+            <h3 class="cert-name">AI For Everyone</h3>
+            <span class="cert-by">Andrew Ng</span>
+          </div>
+          <div class="cert-badge">Verified</div>
+        </div>
+
+        <div class="cert-card glass reveal card-3d">
+          <div class="card-glare"></div>
+          <div class="cert-icon">✨</div>
+          <div class="cert-body">
+            <span class="cert-issuer">Coursera · DeepLearning.AI</span>
+            <h3 class="cert-name">Generative AI for Everyone</h3>
+            <span class="cert-by">Andrew Ng</span>
+          </div>
+          <div class="cert-badge">Verified</div>
+        </div>
+
+        <div class="cert-card glass reveal card-3d">
+          <div class="card-glare"></div>
+          <div class="cert-icon">📊</div>
+          <div class="cert-body">
+            <span class="cert-issuer">Coursera · Stanford University</span>
+            <h3 class="cert-name">Machine Learning Specialization</h3>
+            <span class="cert-by">Andrew Ng</span>
+          </div>
+          <div class="cert-badge">Verified</div>
+        </div>
+
+        <div class="cert-card glass reveal card-3d">
+          <div class="card-glare"></div>
+          <div class="cert-icon">🏆</div>
+          <div class="cert-body">
+            <span class="cert-issuer">Coursera · IBM</span>
+            <h3 class="cert-name">AI Engineering Professional</h3>
+            <span class="cert-by">IBM Certificate</span>
+          </div>
+          <div class="cert-badge gold">Professional</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ CONTACT ═══════════ -->
+  <section id="contact" class="contact section">
+    <div class="container">
+      <div class="section-label reveal"><span>05</span> Contact</div>
+      <h2 class="section-title centered reveal">Let's Connect</h2>
+      <p class="section-sub reveal">Open to internships, collaborations, and opportunities</p>
+      <div class="contact-grid">
+
+        <div class="contact-info reveal">
+          <h3>Get in touch</h3>
+          <p>I'm always open to discussing new projects, AI ideas, or just having a good tech conversation. Feel free to reach out!</p>
+          <div class="contact-links">
+            <a href="mailto:vanshmokani152@gmail.com" class="contact-item">
+              <div class="contact-item-icon"><i data-lucide="mail"></i></div>
+              <div>
+                <span class="contact-item-label">Email</span>
+                <span class="contact-item-val">vanshmokani152@gmail.com</span>
+              </div>
+            </a>
+            <a href="https://github.com/vanshmokani" target="_blank" class="contact-item">
+              <div class="contact-item-icon"><i data-lucide="github"></i></div>
+              <div>
+                <span class="contact-item-label">GitHub</span>
+                <span class="contact-item-val">github.com/vanshmokani</span>
+              </div>
+            </a>
+            <a href="https://www.linkedin.com/in/vansh-mokani-273333382/" target="_blank" class="contact-item">
+              <div class="contact-item-icon"><i data-lucide="linkedin"></i></div>
+              <div>
+                <span class="contact-item-label">LinkedIn</span>
+                <span class="contact-item-val">linkedin.com/in/vanshmokani</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <form class="contact-form glass reveal card-3d" id="contactForm" onsubmit="handleFormSubmit(event)">
+          <div class="card-glare"></div>
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="your@email.com" required />
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="5" placeholder="Tell me about your project or idea..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary full-width">
+            <i data-lucide="send"></i> Send Message
+          </button>
+          <div class="form-success" id="formSuccess">
+            <i data-lucide="check-circle"></i> Message sent! I'll get back to you soon.
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <a href="#home" class="nav-logo">
+          <span class="logo-bracket">&lt;</span>VM<span class="logo-bracket">/&gt;</span>
+        </a>
+        <p>Built with ❤️ by Vansh Mokani · 2024</p>
+        <div class="footer-socials">
+          <a href="https://github.com/vanshmokani"      target="_blank" aria-label="GitHub">  <i data-lucide="github"></i>  </a>
+          <a href="https://www.linkedin.com/in/vansh-mokani-273333382/" target="_blank" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
+          <a href="mailto:vanshmokani152@gmail.com"                      aria-label="Email">   <i data-lucide="mail"></i>    </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
