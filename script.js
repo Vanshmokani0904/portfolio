@@ -281,20 +281,79 @@ function initNavbar() {
 }
 
 function initActiveNav() {
-  const sections = document.querySelectorAll('section[id]');
-  const links    = document.querySelectorAll('.nav-link');
+  const sections  = document.querySelectorAll('section[id]');
+  const links     = document.querySelectorAll('.nav-link');
+  const indicator = document.getElementById('navIndicator');
+  const navList   = document.getElementById('navLinks');
+
+  if (!indicator || !navList) return;
+
+  /* ── Move the indicator to sit behind a given <a> element ── */
+  function moveIndicator(linkEl) {
+    if (!linkEl) return;
+    // offsetLeft is relative to the offsetParent (navList), so no getBoundingClientRect needed
+    // This avoids flicker caused by layout shifts mid-transition
+    indicator.style.opacity = '1';
+    indicator.style.left    = linkEl.offsetLeft + 'px';
+    indicator.style.width   = linkEl.offsetWidth + 'px';
+  }
+
+  /* ── Mark one link active and slide the pill ── */
+  function setActive(href) {
+    links.forEach(l => l.classList.remove('active'));
+    const target = [...links].find(l => l.getAttribute('href') === href);
+    if (!target) return;
+    target.classList.add('active');
+    moveIndicator(target);
+  }
+
+  /* ── Click handler: update immediately on click ── */
+  links.forEach(link => {
+    link.addEventListener('click', () => {
+      setActive(link.getAttribute('href'));
+    });
+  });
+
+  /* ── Scroll: track which section is in the viewport ──
+     Uses a single observer; whichever section crosses the
+     midpoint of the screen becomes active.               */
+  let scrollLocked = false;   // brief lock after click so scroll doesn't override
+
+  links.forEach(link => {
+    link.addEventListener('click', () => {
+      scrollLocked = true;
+      setTimeout(() => { scrollLocked = false; }, 900);
+    });
+  });
 
   const obs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        links.forEach(l => {
-          l.classList.toggle('active', l.getAttribute('href') === `#${entry.target.id}`);
-        });
-      }
-    });
-  }, { threshold: 0.45 });
+    if (scrollLocked) return;
+    // Pick the entry with the highest intersection ratio
+    const visible = entries
+      .filter(e => e.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+    if (visible.length) setActive('#' + visible[0].target.id);
+  }, {
+    threshold    : [0.2, 0.5],
+    rootMargin   : '-64px 0px -30% 0px',
+  });
 
   sections.forEach(s => obs.observe(s));
+
+  /* ── Reposition on window resize ── */
+  window.addEventListener('resize', () => {
+    const active = document.querySelector('.nav-link.active');
+    if (active) moveIndicator(active);
+  }, { passive: true });
+
+  /* ── Initial position — wait for fonts & layout to paint ── */
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      // Default to first link if nothing else is active
+      const first = links[0];
+      if (first) setActive(first.getAttribute('href'));
+    });
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -416,18 +475,48 @@ function initTypingEffect() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   11. CONTACT FORM
+   11. CONTACT FORM — EmailJS Integration
+   ──────────────────────────────────────
+   HOW TO SET UP (free, 5 minutes):
+   1. Go to https://www.emailjs.com and create a free account
+   2. Add a service: Dashboard → Email Services → Add Service → Gmail
+      Copy your SERVICE ID
+   3. Create a template: Email Templates → Create Template
+      Use these variables in the template:
+        From: {{from_name}} <{{from_email}}>
+        Subject: New message from {{from_name}} - Portfolio
+        Body:
+          Name:    {{from_name}}
+          Email:   {{from_email}}
+          Message: {{message}}
+      Copy your TEMPLATE ID
+   4. Get your Public Key: Account → General → Public Key
+   5. Paste all three below ↓
 ══════════════════════════════════════════════════════════════ */
-function handleFormSubmit(e) {
+
+const EMAILJS_SERVICE_ID  = 'service_j4safrz';   // e.g. 'service_abc123'
+const EMAILJS_TEMPLATE_ID = 'template_t7874wc';   // e.g. 'template_xyz789'
+const EMAILJS_PUBLIC_KEY  = 'iXE6EQvdq-nVfMbln1EKe';   // e.g. 'user_XXXXXXXXXXXXXXX'
+
+/* Init EmailJS */
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY) {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
+});
+
+async function handleFormSubmit(e) {
   e.preventDefault();
   const form    = document.getElementById('contactForm');
   const success = document.getElementById('formSuccess');
+  const error   = document.getElementById('formError');
   const btn     = form.querySelector('[type="submit"]');
 
   const name  = form.name.value.trim();
   const email = form.email.value.trim();
   const msg   = form.message.value.trim();
 
+  /* Validation */
   if (!name || !email || !msg) { shakeEl(form); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     form.email.style.borderColor = '#f87171';
@@ -436,17 +525,48 @@ function handleFormSubmit(e) {
     return;
   }
 
-  btn.disabled    = true;
-  btn.textContent = 'Sending…';
+  /* Button loading state */
+  btn.disabled   = true;
+  btn.innerHTML  = '<i data-lucide="loader-2" class="spin"></i> Sending…';
+  lucide.createIcons();
+  if (error) error.classList.remove('show');
 
-  setTimeout(() => {
+  try {
+    /* ── Real send via EmailJS ── */
+    if (typeof emailjs !== 'undefined' && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        from_name : name,    // used as {{from_name}} in template
+        name      : name,    // used as {{name}} in template
+        from_email: email,   // used as {{from_email}} in template
+        message   : msg,     // used as {{message}} in template
+        reply_to  : email,
+        time      : new Date().toLocaleString(),  // used as {{time}} in template
+      });
+    } else {
+      /* No keys set — simulate for testing */
+      await new Promise(r => setTimeout(r, 1200));
+      console.warn('EmailJS not configured. Set EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY in script.js');
+    }
+
+    /* Success */
     form.reset();
+    success.classList.add('show');
+    showToast('✅ Message sent! Vansh will reply soon.');
+    setTimeout(() => success.classList.remove('show'), 6000);
+
+  } catch (err) {
+    /* Error */
+    console.error('EmailJS error:', err);
+    if (error) {
+      error.classList.add('show');
+      setTimeout(() => error.classList.remove('show'), 6000);
+    }
+    showToast('❌ Failed to send. Please email directly at vanshmokani152@gmail.com');
+  } finally {
     btn.disabled  = false;
     btn.innerHTML = '<i data-lucide="send"></i> Send Message';
-    success.classList.add('show');
     lucide.createIcons();
-    setTimeout(() => success.classList.remove('show'), 5000);
-  }, 1500);
+  }
 }
 
 function shakeEl(el) {
@@ -473,10 +593,15 @@ document.head.appendChild(_shake);
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('resumeBtn')?.addEventListener('click', (e) => {
     e.preventDefault();
+    /* ── To enable real download:
+       1. Add your resume PDF as "resume.pdf" in the folder
+       2. Uncomment the lines below:
+       ─────────────────────────────
        const a = document.createElement('a');
        a.href     = 'resume.pdf';
        a.download = 'Vansh_Mokani_Resume.pdf';
        a.click();
+    */
     showToast('📄 Add resume.pdf to the folder, then uncomment lines in script.js');
   });
 });
@@ -547,3 +672,320 @@ function showToast(msg, dur = 3200) {
      </div>
    </div>
 ══════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════
+   AI ASSISTANT — Groq API  (FREE ✅ — works with Student Pack)
+   ──────────────────────────────────────────────────────────
+   WHY GROQ?  Completely free, no billing, insanely fast.
+   Works perfectly with GitHub Student Developer Pack.
+
+   GET YOUR FREE KEY (30 seconds):
+   1. Go to:  https://console.groq.com
+   2. Sign up with GitHub (Student Pack) or Google
+   3. Click "API Keys" → "Create API Key"
+   4. Paste the key below — done! 🚀
+══════════════════════════════════════════════════════════════ */
+
+const GROQ_API_KEY = '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';  // ← Paste your FREE Groq API key here (gsk_...)
+
+/* ── Groq models — tried in order if one is rate-limited ── */
+const GROQ_MODELS = [
+  'llama-3.3-70b-versatile',   // Best quality,  free: 30 RPM 14,400 RPD
+  'llama3-8b-8192',            // Fastest,       free: 30 RPM 14,400 RPD
+  'gemma2-9b-it',              // Google Gemma,  free: 30 RPM 14,400 RPD
+  'mixtral-8x7b-32768',        // Long context,  free: 30 RPM 14,400 RPD
+];
+
+/* ── Vansh's full profile context ── */
+const VANSH_CONTEXT = `You are an AI assistant for Vansh Mokani's developer portfolio website.
+You represent Vansh and answer questions about him in a friendly, professional, enthusiastic way.
+Always speak AS his assistant — referring to him as "Vansh" in third person.
+Keep answers concise (2-4 sentences), helpful, and use emojis occasionally.
+Format bold text using **double asterisks**.
+
+VANSH'S COMPLETE PROFILE:
+Name: Vansh Mokani
+Role: AI/ML Engineering Student
+Location: India
+Email: vanshmokani152@gmail.com
+GitHub: github.com/vanshmokani
+LinkedIn: https://www.linkedin.com/in/vansh-mokani-273333382/
+Status: Actively available for internships and collaborations
+
+SKILLS: Python 92%, C 75%, JavaScript 68%, Machine Learning 85%, Deep Learning 72%, AI Fundamentals 88%, Git & GitHub 80%, VS Code 90%, Cursor AI & Claude AI 82%
+
+PROJECTS:
+1. Jarvis AI Voice Assistant — Python voice assistant with speech recognition, music control, automation
+2. AI News Reader — Python app reads live news via APIs and text-to-speech
+3. Spotify Style Music Player — Python GUI music player with shuffle, playlist support
+4. Face + QR Attendance System — Smart attendance using face recognition and QR codes (FEATURED)
+
+CERTIFICATES:
+- AI For Everyone — Andrew Ng (Coursera / DeepLearning.AI)
+- Generative AI for Everyone — Andrew Ng (Coursera / DeepLearning.AI)
+- Machine Learning Specialization — Andrew Ng (Stanford / Coursera)
+- IBM AI Engineering Professional Certificate — IBM (Coursera)
+
+If asked about hiring → encourage reaching out at vanshmokani152@gmail.com
+If you don't know something → be honest and suggest contacting Vansh directly.`;
+
+/* ── Conversation histories ── */
+let chatHistory  = [];
+let floatHistory = [];
+
+/* ══════════════════════════════════════════════════════════════
+   MAIN SECTION CHAT
+══════════════════════════════════════════════════════════════ */
+async function sendAiMessage() {
+  const input   = document.getElementById('aiInput');
+  const sendBtn = document.getElementById('aiSendBtn');
+  const text    = input.value.trim();
+  if (!text) return;
+
+  input.value      = '';
+  sendBtn.disabled = true;
+
+  appendMessage('aiMessages', text, 'user');
+  chatHistory.push({ role: 'user', content: text });
+
+  const typingId = showTyping('aiMessages');
+  try {
+    const reply = await callGroq(chatHistory);
+    removeTyping('aiMessages', typingId);
+    appendMessage('aiMessages', reply, 'bot');
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch (err) {
+    removeTyping('aiMessages', typingId);
+    appendMessage('aiMessages', getErrorMessage(err), 'bot');
+  }
+  sendBtn.disabled = false;
+  input.focus();
+}
+
+function sendChip(btn) {
+  const input = document.getElementById('aiInput');
+  input.value = btn.textContent.replace(/^[^\w\s]*\s*/, '').trim();
+  document.getElementById('aiChatBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(() => sendAiMessage(), 300);
+}
+
+function clearChat() {
+  chatHistory = [];
+  document.getElementById('aiMessages').innerHTML = '';
+  appendMessage('aiMessages', "Chat cleared! 🧹 Ask me anything about Vansh's skills, projects, or experience.", 'bot');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FLOATING WIDGET CHAT
+══════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle  = document.getElementById('floatToggle');
+  const popup   = document.getElementById('floatPopup');
+  const iconBot = toggle?.querySelector('.icon-bot');
+  const iconX   = toggle?.querySelector('.icon-close');
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = popup.classList.toggle('open');
+    if (iconBot) iconBot.style.display = isOpen ? 'none'  : 'block';
+    if (iconX)   iconX.style.display   = isOpen ? 'block' : 'none';
+    if (isOpen)  document.getElementById('floatInput')?.focus();
+  });
+
+  /* AI nav link uses href="#ai" — smooth scroll handled globally */
+});
+
+async function sendFloatMessage() {
+  const input = document.getElementById('floatInput');
+  const text  = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  appendMessage('floatMessages', text, 'user', true);
+  floatHistory.push({ role: 'user', content: text });
+
+  const typingId = showTyping('floatMessages');
+  try {
+    const reply = await callGroq(floatHistory);
+    removeTyping('floatMessages', typingId);
+    appendMessage('floatMessages', reply, 'bot', true);
+    floatHistory.push({ role: 'assistant', content: reply });
+  } catch (err) {
+    removeTyping('floatMessages', typingId);
+    appendMessage('floatMessages', getErrorMessage(err), 'bot', true);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CORE — Groq API call
+   Groq uses OpenAI-compatible format — simple & clean
+══════════════════════════════════════════════════════════════ */
+async function callGroq(history) {
+  /* No key → smart demo replies */
+  if (!GROQ_API_KEY) {
+    return getDemoReply(history[history.length - 1]?.content || '');
+  }
+
+  const messages = [
+    { role: 'system', content: VANSH_CONTEXT },
+    ...history.slice(-12)   // keep last 12 turns for context
+  ];
+
+  let lastError = '';
+
+  /* Try each model — auto-fallback on rate limit */
+  for (const model of GROQ_MODELS) {
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method : 'POST',
+        headers: {
+          'Content-Type' : 'application/json',
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          max_tokens  : 400,
+          temperature : 0.7,
+          top_p       : 0.9,
+          stream      : false,
+        }),
+      });
+
+      const data = await res.json();
+
+      /* Rate limited or model error → try next */
+      if (!res.ok) {
+        const msg = data?.error?.message || `HTTP ${res.status}`;
+        if (res.status === 429 || res.status === 503) { lastError = msg; continue; }
+        throw new Error(msg);
+      }
+
+      const text = data.choices?.[0]?.message?.content;
+      if (!text) { lastError = 'Empty response'; continue; }
+      return text.trim();
+
+    } catch (e) {
+      if (e.message?.includes('Failed to fetch')) throw e;
+      lastError = e.message;
+    }
+  }
+
+  throw new Error(lastError || 'All Groq models unavailable');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DEMO MODE — works perfectly without any API key
+══════════════════════════════════════════════════════════════ */
+function getDemoReply(question) {
+  const q = question.toLowerCase();
+
+  if (q.match(/^(hi|hello|hey|namaste|yo|sup)/))
+    return "Hey! 👋 I'm Vansh's AI assistant powered by **Groq + Llama 3**. I know everything about his skills, projects, and experience. What would you like to know?";
+
+  if (q.includes('project') || q.includes('built') || q.includes('build') || q.includes('made'))
+    return "Vansh has built **4 real AI projects**! 🚀 His flagship is the **Face + QR Attendance System** using OpenCV & face recognition. He also built **Jarvis AI Voice Assistant**, an **AI News Reader**, and a **Spotify-style Music Player** — all in Python!";
+
+  if (q.includes('skill') || q.includes('python') || q.includes('language') || q.includes('know') || q.includes('code'))
+    return "Vansh's strongest skill is **Python** at 92%! 🐍 He's also skilled in **Machine Learning** (85%), **AI Fundamentals** (88%), and **Deep Learning** (72%). He uses Git, VS Code, Cursor AI, and Claude daily.";
+
+  if (q.includes('cert') || q.includes('course') || q.includes('degree') || q.includes('qualif'))
+    return "Vansh holds **4 verified certificates** 🎓 — **AI For Everyone**, **Generative AI for Everyone**, and the **Machine Learning Specialization** from Andrew Ng, plus the **IBM AI Engineering Professional Certificate**!";
+
+  if (q.includes('hire') || q.includes('job') || q.includes('intern') || q.includes('avail') || q.includes('collab'))
+    return "Yes! Vansh is **actively open** for internships and collaborations 🟢 He's perfect for AI/ML, Python, or intelligent systems roles. Email him at **vanshmokani152@gmail.com** — he responds fast!";
+
+  if (q.includes('contact') || q.includes('email') || q.includes('reach') || q.includes('connect') || q.includes('dm'))
+    return "Reach Vansh at 📬 **vanshmokani152@gmail.com** — or connect on **GitHub** (github.com/vanshmokani) and **LinkedIn** (https://www.linkedin.com/in/vansh-mokani-273333382/). He usually replies within 24 hours!";
+
+  if (q.includes('ml') || q.includes('machine learn') || q.includes('deep learn') || q.includes('neural') || q.includes('model'))
+    return "Vansh is seriously into AI & ML! 🧠 He's completed Stanford + DeepLearning.AI courses, built face recognition & speech AI systems. His goal: create intelligent tools that solve real-world problems.";
+
+  if (q.includes('jarvis') || q.includes('voice') || q.includes('speech'))
+    return "**Jarvis AI Voice Assistant** is super cool! 🤖 Built in Python — it listens to voice commands, controls music, opens apps, and automates tasks. Just like Tony Stark's real Jarvis!";
+
+  if (q.includes('attendance') || q.includes('face recog') || q.includes('qr'))
+    return "The **Face + QR Attendance System** is Vansh's flagship project! 👤 It uses **OpenCV** for face recognition + **QR scanning** to auto-mark attendance, block proxy fraud, and export Excel reports. Perfect for schools!";
+
+  if (q.includes('groq') || q.includes('llama') || q.includes('api') || q.includes('key'))
+    return "This chat is powered by **Groq + Llama 3** 🚀 — the world's fastest AI inference! Get your FREE key at **console.groq.com** (no credit card needed) and paste it into `script.js`. Takes 30 seconds!";
+
+  if (q.includes('student') || q.includes('pack') || q.includes('github'))
+    return "Groq works perfectly with **GitHub Student Developer Pack**! 🎓 Just go to **console.groq.com**, sign in with your GitHub account, create a free API key, and paste it into `script.js`. Zero cost!";
+
+  return "Great question! 🤔 I'm in **demo mode** — add your **FREE Groq API key** from **console.groq.com** to `script.js` to unlock live Llama 3 AI. Meanwhile, Vansh is an AI/ML student with Python expertise, 4 AI projects, and 4 certifications. Ask me anything!";
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UI HELPERS
+══════════════════════════════════════════════════════════════ */
+
+function appendMessage(containerId, text, role, small = false) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
+
+  const isBot = role === 'bot';
+  const msg   = document.createElement('div');
+  msg.className = `ai-msg ai-msg--${role}`;
+
+  /* Render markdown: **bold**, *italic*, bullet lines */
+  const rendered = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,       '<em>$1</em>')
+    .replace(/^• (.*)/gm,          '<span style="display:block;margin-left:8px">• $1</span>')
+    .replace(/\n/g, '<br>');
+
+  msg.innerHTML = `
+    ${isBot
+      ? `<div class="ai-msg-avatar"><i data-lucide="sparkles"></i></div>`
+      : `<div class="ai-msg-avatar">V</div>`}
+    <div class="ai-msg-bubble"><p>${rendered}</p></div>
+  `;
+
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+  lucide.createIcons();
+}
+
+function showTyping(containerId) {
+  const box = document.getElementById(containerId);
+  if (!box) return null;
+
+  const id  = 'typing-' + Date.now();
+  const div = document.createElement('div');
+  div.id        = id;
+  div.className = 'ai-msg ai-msg--bot ai-typing';
+  div.innerHTML = `
+    <div class="ai-msg-avatar"><i data-lucide="sparkles"></i></div>
+    <div class="ai-msg-bubble">
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+    </div>
+  `;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  lucide.createIcons();
+  return id;
+}
+
+function removeTyping(containerId, id) {
+  if (id) document.getElementById(id)?.remove();
+}
+
+function getErrorMessage(err) {
+  const m = err.message || '';
+
+  if (m.includes('Invalid API Key') || m.includes('invalid_api_key') || m.includes('401'))
+    return "⚠️ Invalid Groq API key. Make sure it starts with **gsk_** — get a fresh one at **console.groq.com** and paste it in script.js.";
+
+  if (m.includes('429') || m.includes('rate') || m.includes('unavailable'))
+    return "⚠️ Groq rate limit hit (tried all models). Wait 30 seconds and try again — Groq free tier allows 30 req/min which is very generous!";
+
+  if (m.includes('Failed to fetch') || m.includes('NetworkError'))
+    return "⚠️ Network error — can't reach Groq. Check your internet connection and try again.";
+
+  if (m.includes('401'))
+    return "⚠️ Unauthorised. Double-check your Groq API key in script.js starts with gsk_.";
+
+  return `⚠️ Error: ${m}. Try again or check your Groq API key at console.groq.com.`;
+}
