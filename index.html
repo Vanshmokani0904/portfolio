@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
@@ -28,11 +29,13 @@
 
       <!-- Centre pill links -->
       <ul class="nav-links" id="navLinks">
+        <div class="nav-indicator" id="navIndicator"></div>
         <li><a href="#about"        class="nav-link">About</a></li>
         <li><a href="#skills"       class="nav-link">Skills</a></li>
         <li><a href="#projects"     class="nav-link">Projects</a></li>
         <li><a href="#certificates" class="nav-link">Certs</a></li>
         <li><a href="#contact"      class="nav-link">Contact</a></li>
+        <li><a href="#ai"           class="nav-link nav-link-ai">✦ AI</a></li>
       </ul>
 
       <!-- Right actions -->
@@ -79,7 +82,7 @@
     <!-- Social links in mobile menu -->
     <div class="mobile-socials">
       <a href="https://github.com/vanshmokani"      target="_blank" aria-label="GitHub">  <i data-lucide="github"></i>  </a>
-      <a href="www.linkedin.com/in/vansh-mokani-273333382" target="_blank" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
+      <a href="https://https://www.linkedin.com/in/vansh-mokani-273333382/" target="_blank" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
       <a href="mailto:vanshmokani152@gmail.com"                      aria-label="Email">   <i data-lucide="mail"></i>    </a>
     </div>
   </div>
@@ -119,7 +122,7 @@
       </div>
       <div class="hero-socials reveal">
         <a href="https://github.com/vanshmokani"      target="_blank" class="social-link" aria-label="GitHub">  <i data-lucide="github"></i>  </a>
-        <a href="https://www.linkedin.com/in/vansh-mokani-273333382/" target="_blank" class="social-link" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
+        <a href="https://https://www.linkedin.com/in/vansh-mokani-273333382/" target="_blank" class="social-link" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
         <a href="mailto:vanshmokani152@gmail.com"                      class="social-link" aria-label="Email">   <i data-lucide="mail"></i>    </a>
       </div>
     </div>
@@ -132,7 +135,9 @@
         <div class="ring ring-3"></div>
 
         <div class="profile-photo-frame">
-          <img src="photo.jpg" alt="Vansh Mokani" class="profile-real-img" />
+          <div class="profile-photo-inner">
+            <img src="photo.jpg" alt="Vansh Mokani" class="profile-real-img" />
+          </div>
         </div>
 
         <div class="tech-chip chip-1">🐍 Python</div>
@@ -422,11 +427,11 @@
                 <span class="contact-item-val">github.com/vanshmokani</span>
               </div>
             </a>
-            <a href="https://www.linkedin.com/in/vansh-mokani-273333382/" target="_blank" class="contact-item">
+            <a href="https://https://www.linkedin.com/in/vansh-mokani-273333382/" target="_blank" class="contact-item">
               <div class="contact-item-icon"><i data-lucide="linkedin"></i></div>
               <div>
                 <span class="contact-item-label">LinkedIn</span>
-                <span class="contact-item-val">linkedin.com/in/vanshmokani</span>
+                <span class="contact-item-val">https://www.linkedin.com/in/vansh-mokani-273333382/</span>
               </div>
             </a>
           </div>
@@ -450,13 +455,130 @@
             <i data-lucide="send"></i> Send Message
           </button>
           <div class="form-success" id="formSuccess">
-            <i data-lucide="check-circle"></i> Message sent! I'll get back to you soon.
+            <i data-lucide="check-circle"></i> Message sent! Vansh will get back to you soon. 🎉
+          </div>
+          <div class="form-error" id="formError">
+            <i data-lucide="alert-circle"></i> Failed to send. Please email <a href="mailto:vanshmokani152@gmail.com">vanshmokani152@gmail.com</a> directly.
           </div>
         </form>
 
       </div>
     </div>
   </section>
+
+  <!-- ═══════════ AI ASSISTANT SECTION ═══════════ -->
+  <section id="ai" class="ai-section section">
+    <div class="container">
+      <div class="section-label reveal"><span>06</span> AI Assistant</div>
+      <h2 class="section-title centered reveal">Chat with <em>Vansh's AI</em></h2>
+      <p class="section-sub reveal">Ask me anything about Vansh's skills, projects, or experience</p>
+
+      <div class="ai-chat-wrapper reveal">
+        <!-- Suggestion chips -->
+        <div class="ai-chips">
+          <button class="ai-chip" onclick="sendChip(this)">🤖 What projects has Vansh built?</button>
+          <button class="ai-chip" onclick="sendChip(this)">🐍 What are his Python skills?</button>
+          <button class="ai-chip" onclick="sendChip(this)">📜 Tell me about his certificates</button>
+          <button class="ai-chip" onclick="sendChip(this)">💼 Is he available for hire?</button>
+          <button class="ai-chip" onclick="sendChip(this)">🧠 What ML topics does he know?</button>
+          <button class="ai-chip" onclick="sendChip(this)">📬 How can I contact him?</button>
+        </div>
+
+        <!-- Chat window -->
+        <div class="ai-chat-box glass card-3d" id="aiChatBox">
+          <div class="card-glare"></div>
+
+          <!-- Header -->
+          <div class="ai-chat-header">
+            <div class="ai-avatar">
+              <i data-lucide="bot"></i>
+              <span class="ai-online-dot"></span>
+            </div>
+            <div class="ai-header-info">
+              <span class="ai-name">Vansh's AI Assistant</span>
+              <span class="ai-status">AI Assistant · Online</span>
+            </div>
+            <div class="ai-header-actions">
+              <button class="ai-clear-btn" onclick="clearChat()" title="Clear chat">
+                <i data-lucide="trash-2"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Messages -->
+          <div class="ai-messages" id="aiMessages">
+            <div class="ai-msg ai-msg--bot">
+              <div class="ai-msg-avatar"><i data-lucide="bot"></i></div>
+              <div class="ai-msg-bubble">
+                <p>👋 Hi! I'm Vansh's AI assistant, here to answer your questions about Vansh. 🚀</p>
+                <p>I know everything about Vansh — his projects, skills, certificates, and experience. Ask me anything! 🚀</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input -->
+          <div class="ai-input-row">
+            <input
+              type="text"
+              id="aiInput"
+              class="ai-input"
+              placeholder="Ask about Vansh's skills, projects..."
+              onkeydown="if(event.key==='Enter') sendAiMessage()"
+              autocomplete="off"
+            />
+            <button class="ai-send-btn" onclick="sendAiMessage()" id="aiSendBtn">
+              <i data-lucide="send"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ FLOATING AI CHAT WIDGET ═══════════ -->
+  <div class="float-chat-widget" id="floatWidget">
+    <!-- Toggle button -->
+    <button class="float-chat-toggle" id="floatToggle" aria-label="Open AI chat">
+      <i data-lucide="bot"  class="icon-bot"></i>
+      <i data-lucide="x"    class="icon-close" style="display:none"></i>
+      <span class="float-badge">AI</span>
+    </button>
+
+    <!-- Mini chat popup -->
+    <div class="float-chat-popup glass" id="floatPopup">
+      <div class="float-chat-header">
+        <div class="ai-avatar sm">
+          <i data-lucide="bot"></i>
+          <span class="ai-online-dot"></span>
+        </div>
+        <div>
+          <div class="ai-name">Vansh's AI</div>
+          <div class="ai-status">Ask me anything</div>
+        </div>
+      </div>
+      <div class="float-messages" id="floatMessages">
+        <div class="ai-msg ai-msg--bot">
+          <div class="ai-msg-bubble">
+            <p>Hey! 👋 Ask me about Vansh's skills or projects!</p>
+          </div>
+        </div>
+      </div>
+      <div class="float-input-row">
+        <input
+          type="text"
+          id="floatInput"
+          class="ai-input"
+          placeholder="Type a question..."
+          onkeydown="if(event.key==='Enter') sendFloatMessage()"
+          autocomplete="off"
+        />
+        <button class="ai-send-btn" onclick="sendFloatMessage()">
+          <i data-lucide="send"></i>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ═══════════ FOOTER ═══════════ -->
   <footer class="footer">
@@ -468,7 +590,7 @@
         <p>Built with ❤️ by Vansh Mokani · 2024</p>
         <div class="footer-socials">
           <a href="https://github.com/vanshmokani"      target="_blank" aria-label="GitHub">  <i data-lucide="github"></i>  </a>
-          <a href="https://www.linkedin.com/in/vansh-mokani-273333382/" target="_blank" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
+          <a href="https://https://www.linkedin.com/in/vansh-mokani-273333382/" target="_blank" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
           <a href="mailto:vanshmokani152@gmail.com"                      aria-label="Email">   <i data-lucide="mail"></i>    </a>
         </div>
       </div>
